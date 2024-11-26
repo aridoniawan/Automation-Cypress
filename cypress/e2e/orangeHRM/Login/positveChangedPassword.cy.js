@@ -3,16 +3,15 @@
 describe("Login", () => {
   it("Login", () => {
     cy.visit("https://opensource-demo.orangehrmlive.com/");
+    cy.visit("https://opensource-demo.orangehrmlive.com/");
+    cy.get("h5").contains("Login").should("have.text", "Login");
     cy.get("input[name='username']").type("Admin");
     cy.get("input[name='password']").type("admin123");
-    cy.get(
-      "button[type='submit'].oxd-button.oxd-button--main.orangehrm-login-button"
-    ).click();
-    cy.url({ timeout: 5000 }).should(
-      "include",
-      "/web/index.php/dashboard/index"
-    );
-    cy.get("span.oxd-userdropdown-tab", { timeout: 5000 }).click();
+    cy.intercept("GET", "**/action-summary").as("actionSummary");
+    cy.get('button[type="submit"]').click();
+    cy.wait("@actionSummary");
+    cy.get("h6").contains("Dashboard").should("have.text", "Dashboard");
+    cy.get("span.oxd-userdropdown-tab").click();
     cy.get("a[href='/web/index.php/pim/updatePassword']").click();
     cy.url({ timeout: 5000 }).should(
       "include",
@@ -38,7 +37,8 @@ describe("Login", () => {
       .last()
       .find('input[type="password"]')
       .type("Test123");
-
+    cy.intercept("PUT", "**/update-password").as("updatePassword");
     cy.get("button[type='submit'].orangehrm-left-space").click();
+    cy.wait("@updatePassword");
   });
 });

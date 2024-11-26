@@ -2,12 +2,19 @@
 
 describe("Login", () => {
   it("Login", () => {
-    cy.visit("https://opensource-demo.orangehrmlive.com/");
+    cy.visit(
+      "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login"
+    );
+    cy.get("h5").contains("Login").should("have.text", "Login");
     cy.get("input[name='username']").type("Admin");
     cy.get("input[name='password']").type("admin123");
-    cy.get(
-      "button[type='submit'].oxd-button.oxd-button--main.orangehrm-login-button"
-    ).click();
-    cy.url().should("include", "/web/index.php/dashboard/index");
+    // cy.intercept(
+    //   "GET",
+    //   "https://opensource-demo.orangehrmlive.com/web/index.php/api/v2/dashboard/employees/action-summary"
+    // ).as("actionSummary");
+    cy.intercept("GET", "**/action-summary").as("actionSummary");
+    cy.get('button[type="submit"]').click();
+    cy.wait("@actionSummary");
+    cy.get("h6").contains("Dashboard").should("have.text", "Dashboard");
   });
 });
